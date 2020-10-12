@@ -2,11 +2,18 @@
 
 import sys
 
+HLT = 0b00000001
+LDI = 0b10000010
+PRN = 0b01000111
+
 class CPU:
     """Main CPU class."""
 
     def __init__(self):
         """Construct a new CPU."""
+        self.ram = [0] * 25  # holds 256 bytes 
+        self.reg = [0] * 8   # sets the registers  
+        self.pc = 0
         pass
 
     def load(self):
@@ -19,8 +26,8 @@ class CPU:
         program = [
             # From print8.ls8
             0b10000010, # LDI R0,8
-            0b00000000,
-            0b00001000,
+            0b00000000,  # 0
+            0b00001000,  # 8
             0b01000111, # PRN R0
             0b00000000,
             0b00000001, # HLT
@@ -62,4 +69,44 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+
+        running = True
+
+        while running:
+            IR = self.ram[self.pc]  # instruction register 
+
+            operand_a = self.ram_read(self.pc + 1)
+            operand_b = self.ram_read(self.pc + 2)
+
+            # print(f'{IR} in binary {IR:b}')
+
+            # HLT 
+            if IR ==  HLT:
+                # print('HLT')
+                running = False
+
+            # LDI
+            elif IR == LDI:
+                # print('LDI')
+                self.reg[operand_a] = operand_b   # set register to value 
+
+                self.pc += 3
+
+            # PRN
+            elif IR == PRN: 
+                print(self.reg[operand_a])
+                self.pc += 2
+
+            else:
+                print(f"unknown instruction {IR:b} at address {self.pc}")
+                sys.exit(1)
+            
+            # self.pc += 1
+
+
+    def ram_read(self, address):
+        return self.ram[address]
+    
+
+    def ram_write(self, address, value):
+        self.ram[address] = value 
