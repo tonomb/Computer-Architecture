@@ -1,0 +1,10 @@
+# hi there
+
+1    # PRINT_BEEJ
+3    # SAVE_REG R1, 37   r[1] = 37
+1    # r1
+37
+4    # PRINT_REG      print(r[1])
+1    #r1
+1    # PRINT_BEEJ
+2    #Halt

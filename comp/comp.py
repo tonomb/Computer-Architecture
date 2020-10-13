@@ -19,16 +19,7 @@ HALT = 2
 SAVE_REG = 3
 PRINT_REG = 4
 
-memory = [
-    1, # PRINT_BEEJ
-    3, # SAVE_REG R1, 37   r[1] = 37
-    1, # r1
-    37,
-    4, # PRINT_REG      print(r[1])
-    1, #r1
-    1, # PRINT_BEEJ
-    2, #Halt
-]
+memory = [0] * 256
 
 # Variables are called "registers".
 # * There are a fixed number
@@ -36,6 +27,40 @@ memory = [
 # Registers can hold a single byte 
 
 register = [0] * 8
+
+address = 0
+
+if len(sys.argv) != 2:
+    print('Usage: comp.py progname')
+    sys.exit(1)
+
+file_name = sys.argv[1]
+
+file_name += '.txt'
+
+# sys.exit()
+
+try: 
+    with open(file_name) as f:
+        for line in f:
+            line = line.strip()
+            if line == '' or line[0] =='#':
+                continue
+
+            try:
+                str_value = line.split('#')[0]
+                value = int(str_value, 10)   # base 10 
+
+            except ValueError:
+                print(f'Invalid number: {str_value}')
+                sys.exit(1)
+
+            memory[address] = value
+            address += 1
+
+except FileNotFoundError:
+    print(f'File not found: {sys.argv[1]}.txt')
+    sys.exit(2)
 
 
 # keep track of the address of the currently-executing instuction
