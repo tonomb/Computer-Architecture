@@ -5,6 +5,7 @@ import sys
 HLT = 0b00000001
 LDI = 0b10000010
 PRN = 0b01000111
+MUL = 0b10100010
 
 class CPU:
     """Main CPU class."""
@@ -45,7 +46,8 @@ class CPU:
 
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
-        #elif op == "SUB": etc
+        elif op == 'MUL': 
+            self.reg[reg_a] *= self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -84,26 +86,26 @@ class CPU:
 
             # HLT 
             if IR ==  HLT:
-                # print('HLT')
                 running = False
 
             # LDI
             elif IR == LDI:
-                # print('LDI')
                 self.reg[operand_a] = operand_b   # set register to value 
-
-                self.pc += 3
 
             # PRN
             elif IR == PRN: 
                 print(self.reg[operand_a])
-                self.pc += 2
+
+            elif IR == MUL:
+                self.alu('MUL', operand_a, operand_b)
 
             else:
                 print(f"unknown instruction {IR:b} at address {self.pc}")
                 sys.exit(1)
+
             
-            # self.pc += 1
+            inst_len = ((IR & 0b11000000) >> 6) + 1
+            self.pc += inst_len
 
 
     def ram_read(self, address):
