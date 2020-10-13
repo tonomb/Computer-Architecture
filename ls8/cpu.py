@@ -21,23 +21,25 @@ class CPU:
 
         address = 0
 
-        # For now, we've just hardcoded a program:
+        if len(sys.argv) != 2:
+            print('Usage: ls8.py progname')
+            sys.exit(1)
 
-        program = [
-            # From print8.ls8
-            0b10000010, # LDI R0,8
-            0b00000000,  # 0
-            0b00001000,  # 8
-            0b01000111, # PRN R0
-            0b00000000,
-            0b00000001, # HLT
-        ]
+        file_name = sys.argv[1]
 
-        for instruction in program:
-            self.ram[address] = instruction
-            address += 1
+        with open('examples/' + file_name) as f:
+            for line in f:
+                line = line.strip()
+                if line == '' or line[0] == '#':
+                    continue
 
-
+                str_value = line.split('#')[0]
+                value = int(str_value, 2)
+                
+            
+                self.ram[address] = value
+                address += 1
+        
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
 
