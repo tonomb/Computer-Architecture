@@ -18,6 +18,8 @@ PRINT_BEEJ = 1
 HALT = 2
 SAVE_REG = 3
 PRINT_REG = 4
+PUSH = 5
+POP = 6
 
 memory = [0] * 256
 
@@ -27,6 +29,9 @@ memory = [0] * 256
 # Registers can hold a single byte 
 
 register = [0] * 8
+
+SP = 7
+register[SP] = 0xf4 # <-- Stack pointer 
 
 address = 0
 
@@ -87,6 +92,34 @@ while not halted:
     elif instruction == PRINT_REG: # PRINT_REG
         reg_num = memory[pc + 1]
         print(register[reg_num])
+        pc += 2
+
+    elif instruction == PUSH:
+        # decrement the stack pointer 
+        register[SP] -= 1
+
+        #grab the value out of the given register 
+        reg_num = memory[pc + 1]
+        value = register[reg_num]
+
+        #push to top of stack
+        top_of_stack = register[SP]
+        memory[top_of_stack] = value
+
+        pc += 2
+
+    elif instruction == POP:
+        #copy value from top of stack 
+        top_of_stack = register[SP]
+        value = memory[top_of_stack]
+
+        # store in a register
+        reg_num = memory[pc + 1]
+        register[reg_num] = value
+
+        # increment the stack pointer 
+        register[SP] += 1
+
         pc += 2
 
     else:
