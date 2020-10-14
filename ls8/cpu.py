@@ -6,15 +6,20 @@ HLT = 0b00000001
 LDI = 0b10000010
 PRN = 0b01000111
 MUL = 0b10100010
+PUS = 0b01000101
+POP = 0b01000110
+
+SP = 7
 
 class CPU:
     """Main CPU class."""
 
     def __init__(self):
         """Construct a new CPU."""
-        self.ram = [0] * 25  # holds 256 bytes 
+        self.ram = [0] * 256  # holds 256 bytes 
         self.reg = [0] * 8   # sets the registers  
         self.pc = 0
+        self.reg[SP] = 0xf4    # empty stack pointer
         pass
 
     def load(self):
@@ -36,7 +41,6 @@ class CPU:
 
                 str_value = line.split('#')[0]
                 value = int(str_value, 2)
-                
             
                 self.ram[address] = value
                 address += 1
@@ -96,8 +100,33 @@ class CPU:
             elif IR == PRN: 
                 print(self.reg[operand_a])
 
+            #MUL
             elif IR == MUL:
                 self.alu('MUL', operand_a, operand_b)
+
+            #PUSH
+            elif IR ==PUS:
+                # Decrement the SP
+                self.reg[SP] -= 1
+                #Copy the value in the given register 
+                value = self.reg[operand_a]
+        
+                # to the address pointed to by SP.
+                top_of_stack = self.reg[SP]
+                self.ram[top_of_stack] = value
+                
+            #POP
+            elif IR ==POP:
+                # Copy the value from the address pointed to by SP
+                top_of_stack = self.reg[SP]
+                value = self.ram[top_of_stack]
+
+                # save value in register
+                self.reg[operand_a] = value
+
+                # Increment SP
+                self.reg[SP] += 1
+
 
             else:
                 print(f"unknown instruction {IR:b} at address {self.pc}")
