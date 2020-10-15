@@ -8,6 +8,9 @@ PRN = 0b01000111
 MUL = 0b10100010
 PUS = 0b01000101
 POP = 0b01000110
+CALL = 0b01010000
+RET =  0b00010001
+ADD = 0b10100000
 
 SP = 7
 
@@ -74,6 +77,28 @@ class CPU:
             print(" %02X" % self.reg[i], end='')
 
         print()
+    
+    def push_value(self, value):
+        # Decrement the SP
+        self.reg[SP] -= 1
+
+        # to the address pointed to by SP.
+        top_of_stack = self.reg[SP]
+        self.ram[top_of_stack] = value
+
+    def pop(self):
+        # Copy the value from the address pointed to by SP
+        top_of_stack = self.reg[SP]
+        value = self.ram[top_of_stack]
+
+        # Increment SP
+        self.reg[SP] += 1
+
+        return value 
+        # # save value in register
+        # self.reg[operand_a] = value
+
+        
 
     def run(self):
         """Run the CPU."""
@@ -88,7 +113,7 @@ class CPU:
 
             # print(f'{IR} in binary {IR:b}')
 
-            # HLT 
+            # HALT
             if IR ==  HLT:
                 running = False
 
@@ -96,36 +121,44 @@ class CPU:
             elif IR == LDI:
                 self.reg[operand_a] = operand_b   # set register to value 
 
-            # PRN
+            # PRINT
             elif IR == PRN: 
                 print(self.reg[operand_a])
 
-            #MUL
+            #MULTIPLY
             elif IR == MUL:
                 self.alu('MUL', operand_a, operand_b)
 
             #PUSH
-            elif IR ==PUS:
-                # Decrement the SP
-                self.reg[SP] -= 1
-                #Copy the value in the given register 
+            elif IR == PUS:
                 value = self.reg[operand_a]
-        
-                # to the address pointed to by SP.
-                top_of_stack = self.reg[SP]
-                self.ram[top_of_stack] = value
+                self.push_value(value)
                 
             #POP
-            elif IR ==POP:
-                # Copy the value from the address pointed to by SP
-                top_of_stack = self.reg[SP]
-                value = self.ram[top_of_stack]
-
+            elif IR == POP:
+                value = self.pop()
                 # save value in register
                 self.reg[operand_a] = value
 
-                # Increment SP
-                self.reg[SP] += 1
+            # CALL
+            elif IR == CALL:
+                # push next address onto the stack 
+                self.push_value(self.pc + 2)
+
+                # set the address to pc
+                addr = self.reg[operand_a]
+                self.pc = addr
+            # ADD
+            elif IR == ADD:
+                self.alu('ADD', operand_a, operand_b)
+
+            # RETURN
+            elif IR == RET:
+                # Pop the value from the top of the stack
+                value = self.pop()
+               
+                # store value in the PC.
+                self.pc = value
 
 
             else:
@@ -133,8 +166,12 @@ class CPU:
                 sys.exit(1)
 
             
-            inst_len = ((IR & 0b11000000) >> 6) + 1
-            self.pc += inst_len
+            if ((IR & 0b00010000) >> 4) == 1:
+                pass
+            else:
+                inst_len = ((IR & 0b11000000) >> 6) + 1
+                self.pc += inst_len
+
 
 
     def ram_read(self, address):

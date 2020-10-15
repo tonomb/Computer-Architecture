@@ -1,0 +1,20 @@
+# call the cubroutine
+3 #SAVE_REG R2, [addr]
+2
+10
+
+7 #CALL R2
+2
+
+7 #CALL R2
+2 
+
+7 #CALL R2
+2
+
+2 # HALT
+
+# subroutine 
+1 # print_beej (ADDR 10)
+1 # print_beej
+8 # return 
