@@ -27,8 +27,6 @@ class CPU:
         self.reg = [0] * 8   # sets the registers  
         self.pc = 0
         self.reg[SP] = 0xf4    # empty stack pointer
-        self.fl = 0b00000000
-        pass
 
     def load(self):
         """Load a program into memory."""
@@ -71,6 +69,25 @@ class CPU:
                 self.fl += 0b00000010
             else:
                 self.fl += 0b00000001
+        elif op == 'AND':
+            self.reg[reg_a] &= self.reg[reg_b]
+        elif op == 'OR':
+            self.reg[reg_a] |= self.reg[reg_b]
+        elif op == 'XOR':
+            self.reg[reg_a] ^= self.reg[reg_b]
+        elif op == 'NOT':
+            self.reg[reg_a] = ~self.reg[reg_a]
+        elif op == 'SHL':
+            self.reg[reg_a] = self.reg[reg_a] << self.reg[reg_b]
+        elif op == 'SHR':
+            self.reg[reg_a]= self.reg[reg_a] >> self.reg[reg_b]
+        elif op == 'MOD':
+            if reg_b != 0:
+                self.reg[reg_a] %= self.reg[reg_b]
+            else:
+                print('Cant mod by 0')
+                sys.exit()
+        
         else:
             raise Exception("Unsupported ALU operation")
 
