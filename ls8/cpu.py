@@ -11,6 +11,7 @@ POP = 0b01000110
 CALL = 0b01010000
 RET =  0b00010001
 ADD = 0b10100000
+CMP = 0b10100111
 
 SP = 7
 
@@ -23,6 +24,7 @@ class CPU:
         self.reg = [0] * 8   # sets the registers  
         self.pc = 0
         self.reg[SP] = 0xf4    # empty stack pointer
+        self.fl = 0b00000000
         pass
 
     def load(self):
@@ -55,6 +57,15 @@ class CPU:
             self.reg[reg_a] += self.reg[reg_b]
         elif op == 'MUL': 
             self.reg[reg_a] *= self.reg[reg_b]
+        elif op == 'CMP':
+            value_a = self.reg[reg_a]
+            value_b = self.reg[reg_b]
+            if value_a < value_b:
+                self.fl += 0b00000100
+            elif value_a > value_b:
+                self.fl += 0b00000010
+            else:
+                self.fl += 0b00000001
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -95,11 +106,8 @@ class CPU:
         self.reg[SP] += 1
 
         return value 
-        # # save value in register
-        # self.reg[operand_a] = value
 
-        
-
+    
     def run(self):
         """Run the CPU."""
 
@@ -148,6 +156,7 @@ class CPU:
                 # set the address to pc
                 addr = self.reg[operand_a]
                 self.pc = addr
+                
             # ADD
             elif IR == ADD:
                 self.alu('ADD', operand_a, operand_b)
@@ -160,6 +169,9 @@ class CPU:
                 # store value in the PC.
                 self.pc = value
 
+            # COMPARE
+            elif IR == CMP:
+                self.alu('CMP', operand_a, operand_b)
 
             else:
                 print(f"unknown instruction {IR:b} at address {self.pc}")
@@ -171,7 +183,6 @@ class CPU:
             else:
                 inst_len = ((IR & 0b11000000) >> 6) + 1
                 self.pc += inst_len
-
 
 
     def ram_read(self, address):
