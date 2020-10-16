@@ -65,6 +65,20 @@ but you'll have to implement those three above instructions first!
 * Read this whole file.
 * Skim the spec.
 
+> LS8-Spec: spec file, function descriptions
+> LS8-cheastsheet: 
+> FAQ: computer arquitecture FAQ
+> Readme:  Day to day tasks
+
+>ls8/:
+>   readme: implementation instructions
+>   cpu.py: cpu main class and methods
+>   ls8.py: main file, runds cpu
+>    examples/ : example files to run .ls8 extension, look at later 
+
+> ams/ :  config files , look at later 
+> 
+
 ## Step 1: Add the constructor to `cpu.py`
 
 Add list properties to the `CPU` class to hold 256 bytes of memory and 8
