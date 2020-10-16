@@ -12,6 +12,9 @@ CALL = 0b01010000
 RET =  0b00010001
 ADD = 0b10100000
 CMP = 0b10100111
+JMP = 0b01010100
+JEQ = 0b01010101
+JNE = 0b01010110
 
 SP = 7
 
@@ -60,6 +63,8 @@ class CPU:
         elif op == 'CMP':
             value_a = self.reg[reg_a]
             value_b = self.reg[reg_b]
+            # print(value_a, value_b)
+            self.fl = 0b00000000
             if value_a < value_b:
                 self.fl += 0b00000100
             elif value_a > value_b:
@@ -119,7 +124,7 @@ class CPU:
             operand_a = self.ram_read(self.pc + 1)
             operand_b = self.ram_read(self.pc + 2)
 
-            # print(f'{IR} in binary {IR:b}')
+            # print(f'{IR:08b} at address {self.pc +1}')
 
             # HALT
             if IR ==  HLT:
@@ -173,6 +178,26 @@ class CPU:
             elif IR == CMP:
                 self.alu('CMP', operand_a, operand_b)
 
+            elif IR == JEQ:
+                # e flag is true (000000LGE)
+                if (self.fl & 0b00000001) == 1:
+                    addr = self.reg[operand_a]
+                    self.pc = addr
+                else:
+                    self.pc += 2
+
+            elif IR == JNE:
+                # e flag is false (000000LGE)
+                if (self.fl & 0b000000001) != 1:
+                    addr = self.reg[operand_a]
+                    self.pc = addr
+                else:
+                    self.pc += 2
+            
+            elif IR == JMP:
+                addr = self.reg[operand_a]
+                self.pc = addr
+        
             else:
                 print(f"unknown instruction {IR:b} at address {self.pc}")
                 sys.exit(1)
